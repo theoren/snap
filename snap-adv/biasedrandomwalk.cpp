@@ -128,7 +128,7 @@ int64 PredictMemoryRequirements(PWNet& InNet) {
 }
 
 //Simulates a random walk
-void SimulateWalk(PWNet& InNet, int64 StartNId, const int& WalkLen, TRnd& Rnd, TIntV& WalkV) {
+void SimulateWalk_(PWNet& InNet, int64 StartNId, const int& WalkLen, TRnd& Rnd, TIntV& WalkV) {
   WalkV.Add(StartNId);
   if (WalkLen == 1) { return; }
   if (InNet->GetNI(StartNId).GetOutDeg() == 0) { return; }
@@ -139,5 +139,15 @@ void SimulateWalk(PWNet& InNet, int64 StartNId, const int& WalkLen, TRnd& Rnd, T
     if (InNet->GetNI(Dst).GetOutDeg() == 0) { return; }
     int64 Next = AliasDrawInt(InNet->GetNDat(Dst).GetDat(Src),Rnd);
     WalkV.Add(InNet->GetNI(Dst).GetNbrNId(Next));
+  }
+}
+
+void SimulateWalk(PWNet& InNet, int64 StartNId, const int& WalkLen, TRnd& Rnd, TIntV& WalkV) {
+  SimulateWalk_(InNet, StartNId, WalkLen, Rnd, WalkV);
+  if (1) { // stationary walk
+    int64 Dst = WalkV.Last();
+    while (WalkV.Len() < WalkLen) {
+      WalkV.Add(Dst);
+    }
   }
 }
